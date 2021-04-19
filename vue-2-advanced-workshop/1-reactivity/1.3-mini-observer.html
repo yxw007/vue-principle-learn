@@ -1,61 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vite App</title>
+</head>
+
+<body>
+  <button id="button">按钮</button>
+  <div id="value"></div>
+</body>
+
+</html>
+
 <script>
-function isObject (obj) {
-    return typeof obj === 'object'
-      && !Array.isArray(obj)
-      && obj !== null
-      && obj !== undefined
-}
-
-function observe (obj) {
-  if (!isObject(obj)) {
-    throw new TypeError()
+  function isObject(obj) {
+    return typeof obj === 'object' &&
+      !Array.isArray(obj) &&
+      obj !== null &&
+      obj !== undefined
   }
 
-  Object.keys(obj).forEach(key => {
-    let internalValue = obj[key]
-    let dep = new Dep()
-    Object.defineProperty(obj, key, {
-      get () {
-        dep.depend()
-        return internalValue
-      },
-      set (newValue) {
-        const isChanged = internalValue !== newValue
-        if (isChanged) {
-          internalValue = newValue
-          dep.notify()
+  function observe(obj) {
+    debugger
+    if (!isObject(obj)) {
+      throw new TypeError()
+    }
+
+    Object.keys(obj).forEach(key => {
+      let internalValue = obj[key]
+      let dep = new Dep()
+      Object.defineProperty(obj, key, {
+        get() {
+          console.log("get: internalValue=" + internalValue);
+          dep.depend()
+          return internalValue
+        },
+        set(newValue) {
+          const isChanged = internalValue !== newValue
+          console.log("set: isChanged=" + isChanged + ",oldValue=" + internalValue + ",newValue");
+          if (isChanged) {
+            internalValue = newValue
+            dep.notify()
+          }
         }
-      }
+      })
     })
-  })
-}
-
-window.Dep = class Dep {
-  constructor () {
-    this.subscribers = new Set()
   }
 
-  depend () {
-    if (activeUpdate) {
-      // register the current active update as a subscriber
-      this.subscribers.add(activeUpdate)
+  window.Dep = class Dep {
+    constructor() {
+      this.subscribers = new Set()
+    }
+
+    depend() {
+      if (activeUpdate) {
+        // register the current active update as a subscriber
+        this.subscribers.add(activeUpdate)
+      }
+    }
+
+    notify() {
+      // run all subscriber functions
+      this.subscribers.forEach(subscriber => subscriber())
     }
   }
 
-  notify () {
-    // run all subscriber functions
-    this.subscribers.forEach(subscriber => subscriber())
-  }
-}
+  let activeUpdate
 
-let activeUpdate
-
-function autorun (update) {
-  function wrappedUpdate () {
-    activeUpdate = wrappedUpdate
-    update()
-    activeUpdate = null
+  function autorun(update) {
+    function wrappedUpdate() {
+      activeUpdate = wrappedUpdate
+      update()
+      activeUpdate = null
+    }
+    wrappedUpdate()
   }
-  wrappedUpdate()
-}
+
+  let button = document.getElementById('button');
+  let value = document.getElementById('value');
+  let obj = {
+    name: 'potter',
+    age: 18
+  };
+
+  observe(obj);
+
+  button.addEventListener("click", () => {
+    ++obj.age;
+  });
+
+  autorun(() => {
+    value.textContent = "值:" + obj.age;
+  });
 </script>
