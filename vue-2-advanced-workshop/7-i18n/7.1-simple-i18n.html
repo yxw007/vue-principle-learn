@@ -8,25 +8,36 @@
 </div>
 
 <script>
-const i18nPlugin = {
-  // Implement this!
-}
-
-Vue.use(i18nPlugin, /* option */ {
-  en: { 'welcome-message': 'hello' },
-  zh: { 'welcome-message': '你好' },
-  nl: { 'welcome-message': 'Hallo' }
-})
-
-new Vue({
-  el: '#app',
-  data: {
-    lang: 'en'
-  },
-  methods: {
-    changeLang (lang) {
-      this.lang = lang
+  const i18nPlugin = {
+    install(Vue, locales) {
+      debugger
+      Vue.prototype.$t = function (id) {
+        return locales[this.$root.lang][id];
+      }
     }
   }
-})
+
+  Vue.use(i18nPlugin, /* option */ {
+    en: {
+      'welcome-message': 'hello'
+    },
+    zh: {
+      'welcome-message': '你好'
+    },
+    nl: {
+      'welcome-message': 'Hallo'
+    }
+  })
+
+  new Vue({
+    el: '#app',
+    data: {
+      lang: 'en'
+    },
+    methods: {
+      changeLang(lang) {
+        this.lang = lang
+      }
+    }
+  })
 </script>
