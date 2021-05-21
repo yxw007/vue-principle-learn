@@ -1,0 +1,54 @@
+<div id="app">
+</div>
+<style>
+    .red {
+        color: red;
+    }
+</style>
+<script>
+    function h(tag, props, childs) {
+        return {
+            tag,
+            props,
+            childs
+        }
+    }
+
+    function mount(vdom, container) {
+        const el = document.createElement(vdom.tag)
+        container.appendChild(el)
+        //props
+        if (vdom.props) {
+            for (key in vdom.props) {
+                el.setAttribute(key, vdom.props[key]);
+            }
+        }
+
+        //childs
+        if (typeof vdom.childs == 'string') {
+            el.textContent = vdom.childs;
+        } else {
+            vdom.childs.forEach(item => {
+                mount(item, el);
+            });
+        }
+    }
+
+    const vdom = h('div', {
+        class: 'red'
+    }, [h("span", null, "hello")])
+
+    //1. 将虚拟dom挂载至真实dom上
+    mount(vdom, document.getElementById('app'));
+
+    const vdom2 = h('div', {
+        class: 'green'
+    }, [h("span", null, "changed!")])
+
+    //2. patch两个虚拟dom
+    function patch(n1, n2) {
+        //TODO:
+    }
+
+    patch(vdom, vdom2);
+</script>
