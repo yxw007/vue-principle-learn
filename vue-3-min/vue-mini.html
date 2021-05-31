@@ -4,6 +4,10 @@
     .red {
         color: red;
     }
+
+    .blue {
+        color: blue;
+    }
 </style>
 <script>
     function h(tag, props, childs) {
@@ -32,22 +36,68 @@
                 mount(item, el);
             });
         }
+
+        vdom.el = el;
     }
 
     const vdom = h('div', {
         class: 'red'
-    }, [h("span", null, "hello")])
+    }, "hello")
 
     //1. 将虚拟dom挂载至真实dom上
     mount(vdom, document.getElementById('app'));
 
     const vdom2 = h('div', {
-        class: 'green'
-    }, [h("span", null, "changed!")])
+        class: 'blue'
+    }, "changed!")
 
     //2. patch两个虚拟dom
     function patch(n1, n2) {
-        //TODO:
+        if (n1.tag === n2.tag) {
+            const el = n2.el = n1.el;
+
+            //props
+            const oldProps = n1.props || {};
+            const newProps = n2.props || {};
+
+            //props: update
+            for (key in newProps) {
+                const oldValue = oldProps[key];
+                const newValue = newProps[key];
+                if (newValue != oldValue) {
+                    el.setAttribute(key, newValue);
+                }
+            }
+
+            //props: delete
+            for (key in oldProps) {
+
+                if (!(key in newProps)) {
+                    el.removeAttribute(key);
+                }
+            }
+
+            //childs
+            const oldChilds = n1.childs;
+            const newChilds = n2.childs;
+            if (typeof newChilds === 'string') {
+                if (newChilds != oldChilds) {
+                    el.textContent = newChilds;
+                }
+            } else {
+                if (typeof oldChilds === 'string') {
+                    el.innerHTML = '';
+                    newChilds.forEach(child => {
+                        mount(child, el);
+                    });
+                } else {
+                    //array an array
+                    //TODO: 待完善
+                }
+            }
+        } else {
+
+        }
     }
 
     patch(vdom, vdom2);
