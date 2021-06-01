@@ -38,24 +38,24 @@
         }
 
         vdom.el = el;
+        return el;
     }
 
     const vdom = h('div', {
         class: 'red'
-    }, "hello")
+    }, [h('span', null, "hello")])
 
     //1. 将虚拟dom挂载至真实dom上
     mount(vdom, document.getElementById('app'));
 
     const vdom2 = h('div', {
         class: 'blue'
-    }, "changed!")
+    }, [h('div', null, "changed!"), h('span', null, "child2")])
 
     //2. patch两个虚拟dom
     function patch(n1, n2) {
+        const el = n2.el = n1.el;
         if (n1.tag === n2.tag) {
-            const el = n2.el = n1.el;
-
             //props
             const oldProps = n1.props || {};
             const newProps = n2.props || {};
@@ -91,12 +91,27 @@
                         mount(child, el);
                     });
                 } else {
-                    //array an array
-                    //TODO: 待完善
+                    const commonLen = oldChilds.length < newChilds.length ? oldChilds.length : newChilds.length;
+                    for (let i = 0; i < commonLen; i++) {
+                        const oldChild = oldChilds[i];
+                        const newChild = newChilds[i];
+                        patch(oldChild, newChild);
+                    }
+                    if (oldChilds.length < newChilds.length) {
+                        newChilds.slice(commonLen).forEach(child => {
+                            mount(child, el)
+                        });
+                    } else if (newChilds.length < oldChilds.length) {
+                        oldChilds.slice(commonLen).forEach(child => {
+                            el.remove(child.el);
+                        });
+                    }
                 }
             }
         } else {
-
+            let parentNode = el.parentNode;
+            let newEl = mount(n2, parentNode);
+            parentNode.replaceChild(newEl, el);
         }
     }
 
