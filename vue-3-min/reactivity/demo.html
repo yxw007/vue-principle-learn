@@ -1,0 +1,57 @@
+<script>
+    class Dep {
+        constructor() {
+            this.subscribes = new Set();
+            console.log("Dep Constructior");
+        }
+
+        depend(activeUpdate) {
+            if (activeUpdate) {
+                this.subscribes.add(activeUpdate);
+            }
+        }
+
+        notify() {
+            this.subscribes.forEach(subscribe => subscribe());
+        }
+    }
+
+    function reactive(obj) {
+        const dep = new Dep();
+        let proxy = new Proxy(obj, {
+            get: function (target, propKey, receiver) {
+                console.log(`getting ${propKey}!`);
+
+                let value = Reflect.get(target, propKey, receiver)
+                dep.depend(activeUpdate);
+
+                return value;
+            },
+            set: function (target, propKey, value, receiver) {
+                console.log(`setting ${propKey}!`);
+
+                Reflect.set(target, propKey, value, receiver);
+                dep.notify();
+
+                return value;
+            }
+        });
+        return proxy;
+    }
+
+    let activeUpdate = undefined;
+    function watchEffect(effect) {
+        activeUpdate = effect;
+        effect();
+        activeUpdate = null;
+    }
+
+    let people = reactive({
+        name: "potter",
+        age: 10
+    });
+
+    watchEffect(() => {
+        console.log("watchEffect: name=" + people.name + ",age=" + people.age);
+    })
+</script>
