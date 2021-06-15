@@ -1,5 +1,72 @@
 <script>
-export default {
-    
-}
+    class Dep {
+        constructor() {
+            this.subscribes = new Set();
+            console.log("Dep Constructior");
+        }
+
+        depend() {
+            if (activeUpdate) {
+                this.subscribes.add(activeUpdate);
+            }
+        }
+
+        notify() {
+            this.subscribes.forEach(subscribe => subscribe());
+        }
+    }
+
+    const targetMap = new WeakMap();
+
+    //疑问：为啥对象每个属性都要搞一个dep来依赖控制？
+    function getDep(target, key) {
+        let depMap = targetMap.get(target);
+        if (!depMap) {
+            depMap = new Map();
+            targetMap.set(target, depMap);
+        }
+        depMap = targetMap.get(target);
+        let dep = depMap.get(key);
+        if (!dep) {
+            dep = new Dep();
+            depMap.set(key, dep);
+        }
+        return dep;
+    }
+
+    let reactiveHandlers = {
+        get(target, key, receiver) {
+            const dep = getDep(target, key);
+            dep.depend();
+            const value = Reflect.get(target, key, receiver);
+            return value;
+        },
+        set(target, key, value, receiver) {
+            const dep = getDep(target, key);
+            const result = Reflect.set(target, key, value, receiver);
+            dep.notify();
+            return result;
+        }
+    }
+
+    function reactive(raw) {
+        return new Proxy(raw, reactiveHandlers);
+    }
+
+    let activeUpdate = undefined;
+
+    function watchEffect(effect) {
+        activeUpdate = effect;
+        effect();
+        activeUpdate = null;
+    }
+
+    const people = reactive({
+        name: "potter",
+        age: 10
+    });
+
+    watchEffect(() => {
+        console.log("watchEffect: name=" + people.name + ",age=" + people.age);
+    });
 </script>
