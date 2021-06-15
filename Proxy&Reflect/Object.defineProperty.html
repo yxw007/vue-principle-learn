@@ -1,0 +1,55 @@
+<script>
+    /**
+     * 了解Object.defineProperty 拦截
+     */
+
+    let hero = {
+        name: 'potter',
+        hp: 100,
+        sp: 100,
+        equipment: ['马', '长枪']
+    }
+
+    Object.keys(hero).forEach(key => {
+        let internalValue = hero[key]
+        Object.defineProperty(hero, key, {
+            get() {
+                console.log(`getting key "${key}": ${internalValue}`)
+                return internalValue
+            },
+            set(newValue) {
+                console.log(`setting key "${key}" to: ${newValue}`)
+                internalValue = newValue
+            }
+        })
+    })
+
+    console.log("------------");
+    hero.name="yan"
+    console.log(hero.name);
+
+    console.log("------------");
+    hero.equipment.push("xxx");
+    console.log(hero.equipment);
+
+    //说明：对象数组字段变化,无法拦截。采用value方式
+    console.log("------------");
+    hero.equipment = ["佩剑"];
+    console.log(hero.equipment);
+
+    Object.defineProperty(hero.equipment,'push',{
+        value(){
+            console.log("value");
+            console.log(arguments[0]);
+            console.log("this");
+            console.log(this);
+            this[this.length] = arguments[0]
+        }
+    });
+
+    console.log("------pre------");
+    hero.equipment.push("xxx");
+    console.log(hero.equipment);
+    console.log("-------after-----");
+  
+</script>

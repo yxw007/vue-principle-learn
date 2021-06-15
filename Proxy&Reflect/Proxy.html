@@ -1,0 +1,28 @@
+<script>
+    /**
+     * 了解Proxy 拦截对象数组
+     * 参考文献：https://zhuanlan.zhihu.com/p/60126477
+     */
+
+    let hero = {
+        name: '赵云',
+        hp: 100,
+        sp: 100,
+        equipment: ['马', '长枪']
+    }
+
+    let handler = {
+        set(target, property, value) {
+            console.log(`object's ${property} change to ${value}`);
+            target[property] = value;
+            return true;
+        }
+    }
+
+    let heroProxy = new Proxy(hero.equipment, handler);
+    heroProxy.push('佩剑');
+    //output: object's 2 change to 佩剑
+    //output: Proxy.html:16 object's length change to 3
+    console.log(hero.equipment);
+    //output: (3) ["马", "长枪", "佩剑"]
+</script>

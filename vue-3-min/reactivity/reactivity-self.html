@@ -30,10 +30,10 @@
             set: function (target, propKey, value, receiver) {
                 console.log(`setting ${propKey}!`);
 
-                Reflect.set(target, propKey, value, receiver);
+                const result = Reflect.set(target, propKey, value, receiver);
                 dep.notify();
 
-                return value;
+                return result;
             }
         });
         return proxy;
