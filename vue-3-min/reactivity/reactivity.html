@@ -16,6 +16,7 @@
         }
     }
 
+    //使用WeakMap 原因：可被垃圾回收器自动回收，而Map 不会被垃圾回收器自动回收，需要手动清理
     const targetMap = new WeakMap();
 
     //疑问：为啥对象每个属性都要搞一个dep来依赖控制？
@@ -34,6 +35,9 @@
         return dep;
     }
 
+    //说明：采用Reflect 
+    //原因1：保证不管存不存在原型链继承，都能保存操作正确。
+    //原因2：语义更明确，避免异常抛出等
     let reactiveHandlers = {
         get(target, key, receiver) {
             const dep = getDep(target, key);
@@ -61,6 +65,7 @@
         activeUpdate = null;
     }
 
+    //对象响应式
     const people = reactive({
         name: "potter",
         age: 10
@@ -69,4 +74,18 @@
     watchEffect(() => {
         console.log("watchEffect: name=" + people.name + ",age=" + people.age);
     });
+    //output : watchEffect: name=potter,age=10
+
+    //数组响应式
+    const names = reactive(["potter"]);
+
+    watchEffect(() => {
+        //收集1: get origin 依赖; 收集2：get valueOf 依赖; 收集3：get toString 依赖; 收集4：get join 依赖; 收集5：get lenght 依赖 收集6: get 0 依赖
+        console.log("watchEffect: names=" + names);
+    });
+    //output : watchEffect: names=potter
+    
+    names.push("yan"); //触发1: set 1; 触发2: set length ;
+    //output : watchEffect: names=potter,yan
+
 </script>
