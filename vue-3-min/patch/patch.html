@@ -53,12 +53,12 @@
     }, [h('div', null, "changed!"), h('span', null, "child2")])
 
     //2. patch两个虚拟dom
-    function patch(n1, n2) {
-        const el = n2.el = n1.el;
-        if (n1.tag === n2.tag) {
+    function patch(preNode, newNode) {
+        const el = newNode.el = preNode.el;
+        if (preNode.tag === newNode.tag) {
             //props
-            const oldProps = n1.props || {};
-            const newProps = n2.props || {};
+            const oldProps = preNode.props || {};
+            const newProps = newNode.props || {};
 
             //props: update
             for (key in newProps) {
@@ -78,8 +78,8 @@
             }
 
             //childs
-            const oldChilds = n1.childs;
-            const newChilds = n2.childs;
+            const oldChilds = preNode.childs;
+            const newChilds = newNode.childs;
             if (typeof newChilds === 'string') {
                 if (newChilds != oldChilds) {
                     el.textContent = newChilds;
@@ -110,7 +110,7 @@
             }
         } else {
             let parentNode = el.parentNode;
-            let newEl = mount(n2, parentNode);
+            let newEl = mount(newNode, parentNode);
             parentNode.replaceChild(newEl, el);
         }
     }
