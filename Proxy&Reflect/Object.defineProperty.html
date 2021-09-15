@@ -1,10 +1,12 @@
 <script>
     /**
      * 了解Object.defineProperty 拦截
+     * 参考文献：https://zhuanlan.zhihu.com/p/60126477
+     * 更多数组拦截参考：https://stackoverflow.com/questions/5100376/how-to-watch-for-array-changes
      */
 
     let hero = {
-        name: 'potter',
+        name: '赵云',
         hp: 100,
         sp: 100,
         equipment: ['马', '长枪']
@@ -18,38 +20,45 @@
                 return internalValue
             },
             set(newValue) {
-                console.log(`setting key "${key}" to: ${newValue}`)
+                console.log(`setting key "${key}": ${internalValue} -> ${newValue}`)
                 internalValue = newValue
             }
         })
     })
+    
+    console.log("---------------Object.defineProperty 拦截测试-----------------------");
+    console.log("---------------第一部分：常规测试-----------------------");
+    console.log("------修改：对象-string类型字段，拦截测试------");
+    hero.name = "吕布"
+    console.log(`更改后结果：${hero.name}`);
+    //结论1：对象-普通字段修改，可以被get set拦截
 
-    console.log("------------");
-    hero.name="yan"
-    console.log(hero.name);
+    console.log("------修改：对象-数组类型字段，新增元素，拦截测试------");
+    hero.equipment.push("盔甲");
+    console.log(`更改后结果： ${hero.equipment}`);
+    //结论2：对象-数组字段新增元素,可以被get拦截，无法被set拦截
 
-    console.log("------------");
-    hero.equipment.push("xxx");
-    console.log(hero.equipment);
+    console.log("------修改：对象-添加字段，拦截测试------");
+    hero.age = 23;
+    console.log(`更改后结果： ${hero.age}`);
+    //结论3：对象-添加字段,无法被get set拦截
 
-    //说明：对象数组字段变化,无法拦截。采用value方式
-    console.log("------------");
-    hero.equipment = ["佩剑"];
-    console.log(hero.equipment);
+    console.log("------修改：对象-删除字段，拦截测试------");
+    delete hero.name;
+    console.log(`更改后结果： ${hero.name}`);
+    //结论4：对象-删除字段,无法被get 拦截
 
-    Object.defineProperty(hero.equipment,'push',{
-        value(){
-            console.log("value");
-            console.log(arguments[0]);
-            console.log("this");
-            console.log(this);
+    Object.defineProperty(hero.equipment, 'push', {
+        value() {
+            console.log(`value ${this} -  ${arguments[0]}`)
             this[this.length] = arguments[0]
         }
     });
 
-    console.log("------pre------");
-    hero.equipment.push("xxx");
-    console.log(hero.equipment);
-    console.log("-------after-----");
-  
+    console.log("---------------第二部分：对象-数组value拦截测试-----------------------");
+    console.log("------修改：数组类型字段，新增元素，拦截测试------");
+    console.log(`当前 equipment： ${hero.equipment}`);
+    hero.equipment.push("匕首");
+    console.log(`新增[匕首]后 equipment： ${hero.equipment}`);
+    //结论5：可以利用value 拦截到对象-数组字段元素删减
 </script>

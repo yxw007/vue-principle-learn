@@ -19,7 +19,6 @@
     //使用WeakMap 原因：可被垃圾回收器自动回收，而Map 不会被垃圾回收器自动回收，需要手动清理
     const targetMap = new WeakMap();
 
-    //疑问：为啥对象每个属性都要搞一个dep来依赖控制？
     function getDep(target, key) {
         let depMap = targetMap.get(target);
         if (!depMap) {

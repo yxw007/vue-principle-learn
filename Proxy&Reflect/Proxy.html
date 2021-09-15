@@ -12,17 +12,52 @@
     }
 
     let handler = {
-        set(target, property, value) {
-            console.log(`object's ${property} change to ${value}`);
-            target[property] = value;
-            return true;
+        get: function (target, key, receiver) {
+            let value = Reflect.get(target, key, receiver)
+            console.log(`getting key "${key}": ${value}`)
+            return value;
+        },
+        set: function (target, key, value, receiver) {
+            let oldValue = Reflect.get(target, key, receiver);
+            const result = Reflect.set(target, key, value, receiver);
+            console.log(`setting key "${key}": ${oldValue} -> ${value}  result:${result}`)
+            return result
         }
     }
 
-    let heroProxy = new Proxy(hero.equipment, handler);
-    heroProxy.push('佩剑');
-    //output: object's 2 change to 佩剑
-    //output: Proxy.html:16 object's length change to 3
-    console.log(hero.equipment);
-    //output: (3) ["马", "长枪", "佩剑"]
+    let heroProxy = new Proxy(hero, handler);
+
+    console.log("---------------Proxy 拦截测试-----------------------");
+    console.log("---------------第一部分：常规测试-----------------------");
+    console.log("------修改：对象string类型字段，拦截测试------");
+    heroProxy.name = "吕布"
+    console.log(`更改后结果：${heroProxy.name}`);
+    //结论1：对象-普通字段修改，可以被get set拦截
+
+    console.log("------修改：对象数组类型字段，新增元素，拦截测试------");
+    heroProxy.equipment.push("盔甲");
+    console.log(`更改后结果： ${heroProxy.equipment}`);
+    //结论2：对象-数组字段新增元素,可以被get拦截，无法被set拦截
+
+    console.log("------修改：对象-添加字段，拦截测试------");
+    heroProxy.age = 23;
+    console.log(`更改后结果： ${heroProxy.age}`);
+    //结论3：对象-添加字段,可以被set拦截
+    
+    console.log("------修改：对象-删除字段，拦截测试------");
+    delete heroProxy.name;
+    console.log(`更改后结果： ${heroProxy.name}`);
+    //结论4：对象-删除字段,可以被get拦截
+
+    console.log("---------------第二部分：对数组拦截测试-----------------------");
+    let heroProxyArray = new Proxy(hero.equipment, handler);
+    console.log("------修改：对象数组类型字段，新增元素，拦截测试------");
+    console.log(`当前 equipment：`);
+    console.log(heroProxyArray);
+
+    heroProxyArray.push("匕首");
+
+    console.log(`新增[匕首]后 equipment：`);
+    console.log(heroProxyArray);
+     //结论5：利用proxy 即可轻松拦截数组变化
 </script>
