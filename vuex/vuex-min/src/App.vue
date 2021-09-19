@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    {{$store.getters.getAge}}
+    My Father Age: {{$store.getters.getParentAge}}
     <hello-world></hello-world>
   </div>
 </template>
@@ -14,6 +14,7 @@ export default {
     HelloWorld
   },
   mounted(){
+    console.log("mounted");
     let self = this;
     setTimeout(()=>{
       self.$store.state.age = 10000;
