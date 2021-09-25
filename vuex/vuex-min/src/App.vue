@@ -2,6 +2,12 @@
   <div id="app">
     My Father Age: {{$store.getters.getParentAge}}
     <hello-world></hello-world>
+    <br>
+    getModuleName： {{$store.getters.getModuleName}}
+    <br>
+    getSubModuleAName: {{$store.getters.getSubModuleAName}}
+    <br>
+    {{$store.state.a.x}}
   </div>
 </template>
 

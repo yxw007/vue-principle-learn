@@ -1,6 +1,11 @@
 import Vue from 'vue'
 // import Vuex from 'vuex'
-import Vuex from './vuex'
+
+//说明：vuex-0.x为最初级版本（支持：state、getters、mutations、actions）
+// import Vuex from './vuex-0.x'
+
+//说明：vuex-1.x为vue-0.x版本基础上，新增：支持模块嵌套、模块数据隔离等
+import Vuex from './vuex-1.x'
 
 Vue.use(Vuex)
 
@@ -11,6 +16,7 @@ export default new Vuex.Store({
   },
   getters:{
     getParentAge: (state)=>state.age + 20,
+    getModuleName:(state)=>"Module Root"
   },
   mutations:{
     increaseAge(state,params){
@@ -24,6 +30,9 @@ export default new Vuex.Store({
     },
     decreaseCount(state,params){
       state.count -=params;
+    },
+    sayHello(state,params){
+      console.log("Root Module : say Hello");
     }
   },
   actions:{
@@ -45,6 +54,22 @@ export default new Vuex.Store({
     asychrIncreaseCount({commit,dispatch},params){
       commit("increaseCount",100);
       dispatch("asychrDecreaseCount",params);
+    }
+  },
+  modules:{
+    a:{
+      state:{
+        x:'xxxx'
+      },
+      getters:{
+        getModuleName:(state)=>"Module A",
+        getSubModuleAName:(state)=>"Sub Module A"
+      },
+      mutations:{
+        sayHello(state,params){
+          console.log("A Module : say Hello");
+        }
+      }
     }
   }
 });

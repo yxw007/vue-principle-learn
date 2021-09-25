@@ -12,6 +12,9 @@
     <span @click="asychrAddCount">asychrAddCount</span>
     <br>
     Count: {{$store.state.count}}
+    <br>
+    <br>
+    <span @click="callMultiSameMutation">Call Root and Sub 's Same mutation</span>
   </div>
 </template>
 
@@ -35,6 +38,9 @@ export default {
     },
     asychrAddCount(){
       this.$store.dispatch('asychrIncreaseCount',1000);
+    },
+    callMultiSameMutation(){
+      this.$store.commit("sayHello");
     }
   }
 }

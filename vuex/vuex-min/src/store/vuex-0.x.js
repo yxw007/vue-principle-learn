@@ -33,10 +33,11 @@ function Foreach(obj,callback){
 class Store {
     constructor(options){
         this.vm = new Vue({
-            data: options.state
+            data: {
+                state:options.state
+            }
         });
-        this.state = this.vm.$data;
-
+        this.state = this.vm.state;
         let getters = options.getters;
         this.getters = {};
         Foreach(getters,(key,fn)=>{
