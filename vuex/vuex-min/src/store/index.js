@@ -6,7 +6,6 @@ import Vue from 'vue'
 
 //说明：vuex-1.x为vue-0.x版本基础上，新增：支持模块嵌套、模块数据隔离等
 import Vuex from './vuex-1.x'
-
 Vue.use(Vuex)
 
 export default new Vuex.Store({

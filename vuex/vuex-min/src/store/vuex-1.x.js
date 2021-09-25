@@ -60,7 +60,7 @@ class ModuleCollection{
     }
 }
 
-function installModule(store,state,path,module){
+function installModule(store,state,path,module){ 
     //将子模块state 挂在到父模块state上
     if(path.length > 0){
         let parent = path.slice(0,-1).reduce((pre,current)=>{
@@ -124,8 +124,6 @@ class Store {
                 state:options.state
             }
         });
-        //0. 获取响应式数据  更多说明：取值也可使用this.vm.$data.state 因为：this.vm.state 与 this.vm.$data.state 为同一个对象
-        this.state = this.vm.state;
         this.getters = {};
         this.mutations = {};
         this.actions = {};
@@ -156,6 +154,11 @@ class Store {
          this.actions[methodName].forEach(fn=>{
             fn(this,params)
          });
+    }
+
+    get state(){
+        //0. 获取响应式数据  更多说明：取值也可使用this.vm.$data.state 因为：this.vm.state 与 this.vm.$data.state 为同一个对象
+        return this.vm.state;
     }
 }
 
